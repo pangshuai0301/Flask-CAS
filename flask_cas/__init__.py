@@ -66,7 +66,7 @@ class CAS(object):
 
     def teardown(self, exception):
         ctx = stack.top
-    
+
     @property
     def app(self):
         return self._app or current_app
@@ -96,7 +96,11 @@ def login_required(function):
     @wraps(function)
     def wrap(*args, **kwargs):
         if 'CAS_USERNAME' not in flask.session:
-            flask.session['CAS_AFTER_LOGIN_SESSION_URL'] = flask.request.path
+            args_list = request.args.items()
+            args_str = '?'
+            for args_tuple in args_list:
+                args_str = "%s=%s&" % (args_tuple[0], args_tuple[1])
+            flask.session['CAS_AFTER_LOGIN_SESSION_URL'] = flask.request.path + args_str
             return login()
         else:
             return function(*args, **kwargs)
